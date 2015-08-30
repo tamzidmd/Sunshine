@@ -105,21 +105,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        // Check for empty cursor
-        if (data.getCount() == 0) {
-            ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-            if (networkInfo == null || !networkInfo.isConnected()) {
-                mNetworkDisconnectedTextView.setText(getText(R.string.network_state_error));
-            }
-        }
-
         // Swap the new cursor in. (The framework will take care of closing the old cursor once we return.)
         mForecastAdapter.swapCursor(data);
 
         if (mPosition != ListView.INVALID_POSITION) {
             mListView.smoothScrollToPosition(mPosition);
         }
+
+        updateEmptyView();
     }
 
     @Override
@@ -171,6 +164,20 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
+    private void updateEmptyView() {
+        if (mForecastAdapter.getCount() == 0) {
+            mNetworkDisconnectedTextView = (TextView) getView().findViewById(R.id.listview_forecast_empty);
+            if (mNetworkDisconnectedTextView != null) {
+                // If the cursor is empty, is it because the network is unavailable?
+                int message = R.string.empty_forecast_list;
+                if (!Utility.isNetworkAvailable(getActivity())) {
+                    message = R.string.empty_forecast_list_network_state_error;
+                }
+                mNetworkDisconnectedTextView.setText(message);
+            }
+        }
+    }
+
     //endregion
 
     //region *** LIFE CYCLE METHODS ***
@@ -212,7 +219,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         // The CursorAdapter will take data from our cursor and populate the ListView.
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
 
-        mNetworkDisconnectedTextView = (TextView) v.findViewById(R.id.listview_forecast_network_error);
         TextView emptyTextView = (TextView) v.findViewById(R.id.listview_forecast_empty);
 
         mListView = (ListView) v.findViewById(R.id.listview_forecast);

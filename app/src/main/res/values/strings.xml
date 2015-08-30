@@ -77,6 +77,6 @@
     <string name="empty_forecast_list">No Weather Information Available</string>
 
     <!-- Error message when weather data cannot be fetched from server -->
-    <string name="network_state_error">The network is not available to fetch weather data</string>
+    <string name="empty_forecast_list_network_state_error">The network is not available to fetch weather data</string>
 
 </resources>
