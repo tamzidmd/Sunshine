@@ -46,7 +46,7 @@
         Wind: <xliff:g id="speed">%1$1.0f</xliff:g> mph <xliff:g id="direction">%2$s</xliff:g>
     </string>
 
-        <!-- Wind in kph [CHAR LIMIT=25] -->
+    <!-- Wind in kph [CHAR LIMIT=25] -->
     <string name="format_wind_kmh">
         Wind: <xliff:g id="speed">%1$1.0f</xliff:g> km/h <xliff:g id="direction">%2$s</xliff:g>
     </string>
@@ -72,5 +72,11 @@
     <!-- Strings related to Notification preference -->
     <string name="pref_last_notification">last_notification
     </string>
+
+    <!-- Empty view text for forecast list -->
+    <string name="empty_forecast_list">No Weather Information Available</string>
+
+    <!-- Error message when weather data cannot be fetched from server -->
+    <string name="network_state_error">The network is not available to fetch weather data</string>
 
 </resources>

@@ -1,8 +1,11 @@
 package com.example.android.sunshine.app;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
@@ -61,6 +65,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private ForecastAdapter mForecastAdapter;
     private ListView mListView;
+    private TextView mNetworkDisconnectedTextView;
     private int mPosition = ListView.INVALID_POSITION;
 
     private double mLongitude;
@@ -100,6 +105,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        // Check for empty cursor
+        if (data.getCount() == 0) {
+            ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            if (networkInfo == null || !networkInfo.isConnected()) {
+                mNetworkDisconnectedTextView.setText(getText(R.string.network_state_error));
+            }
+        }
+
         // Swap the new cursor in. (The framework will take care of closing the old cursor once we return.)
         mForecastAdapter.swapCursor(data);
 
@@ -135,7 +149,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     public void openPreferredLocationInMap() {
-        if (mForecastAdapter.getCursor() != null) {
+        if (mForecastAdapter.getCursor() != null && mForecastAdapter.getCursor().getCount() != 0) {
             Cursor cursor = mForecastAdapter.getCursor();
             mLongitude = cursor.getDouble(ForecastFragment.COL_COORD_LONG);
             mLatitude = cursor.getDouble(ForecastFragment.COL_COORD_LAT);
@@ -198,7 +212,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         // The CursorAdapter will take data from our cursor and populate the ListView.
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
 
+        mNetworkDisconnectedTextView = (TextView) v.findViewById(R.id.listview_forecast_network_error);
+        TextView emptyTextView = (TextView) v.findViewById(R.id.listview_forecast_empty);
+
         mListView = (ListView) v.findViewById(R.id.listview_forecast);
+        mListView.setEmptyView(emptyTextView);
         mListView.setAdapter(mForecastAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
