@@ -196,7 +196,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
         String pressure = String.format(getString(R.string.format_pressure), data.getDouble(COL_WEATHER_PRES));
         mPressureView.setText(pressure);
 
-        String weatherDescription = data.getString(COL_WEATHER_DESC);
+        String weatherDescription = Utility.getStringForWeatherCondition(getActivity(), weatherId);
         mDescriptionView.setText(weatherDescription);
 
         mCompassView.setDirection(data.getFloat(COL_WEATHER_DEG));

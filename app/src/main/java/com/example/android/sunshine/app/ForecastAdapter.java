@@ -77,6 +77,7 @@ public class ForecastAdapter extends CursorAdapter {
         int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID);
         int viewType = getItemViewType(cursor.getPosition());
 
+
         switch (viewType) {
             case VIEW_TYPE_TODAY:
                 viewHolder.iconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
@@ -91,8 +92,8 @@ public class ForecastAdapter extends CursorAdapter {
         String friendlyDateString = Utility.getFriendlyDayString(context, date);
         viewHolder.dateView.setText(friendlyDateString);
 
-        // Read weather forecast from cursor
-        String forecast = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
+        // Get description from weather condition ID
+        String forecast = Utility.getStringForWeatherCondition(context, weatherId);
         viewHolder.descriptionView.setText(forecast);
 
         // Read high temperature from cursor
