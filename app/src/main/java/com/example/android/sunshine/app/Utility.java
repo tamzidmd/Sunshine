@@ -71,6 +71,17 @@ public class Utility {
         return prefs.getInt(context.getString(R.string.pref_location_status_key), SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
     }
 
+    /**
+     * Set the location status to LOCATION_STATUS_UNKNOWN
+     * @param context context to get shared preferences
+     */
+    public static void resetLocationStatus(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor sharedPreferencesEditor = prefs.edit();
+        sharedPreferencesEditor.putInt(context.getString(R.string.pref_location_status_key), SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
+        sharedPreferencesEditor.apply();
+    }
+
     public static String formatTemperature(Context context, double temperature) {
         double temp;
         if ( !isMetric(context) ) {
