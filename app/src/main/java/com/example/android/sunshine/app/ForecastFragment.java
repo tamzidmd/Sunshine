@@ -3,11 +3,13 @@ package com.example.android.sunshine.app;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -30,7 +32,7 @@ import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, SharedPreferences.OnSharedPreferenceChangeListener {
     private final String LOG_TAG = ForecastFragment.class.getSimpleName();
 
     private static final String ITEM_SELECTION = "ITEMSELECTION";
@@ -85,6 +87,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
          */
         void onItemSelected(Uri dateUri);
     }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_location_status_key))) {
+            updateEmptyView();
+        }
+    }
+
 
     //endregion
 
@@ -170,11 +180,32 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             if (mNetworkDisconnectedTextView != null) {
                 // If the cursor is empty, is it because the network is unavailable?
                 int message = R.string.empty_forecast_list;
-                if (!Utility.isNetworkAvailable(getActivity())) {
-                    message = R.string.empty_forecast_list_network_state_error;
+
+                @SunshineSyncAdapter.LocationStatus int location = Utility.getLocationStatus(getActivity());
+                switch (location) {
+                    case SunshineSyncAdapter.LOCATION_STATUS_SERVER_DOWN:
+                        message = R.string.empty_forecast_list_server_down;
+                        break;
+                    case SunshineSyncAdapter.LOCATION_STATUS_SERVER_INVALID:
+                        message = R.string.empty_forecast_list_server_error;
+                        break;
+                    default:
+                        if (!Utility.isNetworkAvailable(getActivity())) {
+                            message = R.string.empty_forecast_list_no_network;
+                        }
                 }
+
                 mNetworkDisconnectedTextView.setText(message);
             }
+        }
+    }
+
+    private void registerSharedPreferencesListener(boolean doRegister) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if (doRegister) {
+            sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        } else {
+            sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
         }
     }
 
@@ -244,6 +275,18 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         }
 
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerSharedPreferencesListener(true);
+    }
+
+    @Override
+    public void onPause() {
+        registerSharedPreferencesListener(false);
+        super.onPause();
     }
 
     @Override

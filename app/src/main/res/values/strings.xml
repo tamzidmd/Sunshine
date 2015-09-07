@@ -77,8 +77,8 @@
 
     <!-- Empty view text for forecast list -->
     <string name="empty_forecast_list">No Weather Information Available</string>
-
-    <!-- Error message when weather data cannot be fetched from server -->
-    <string name="empty_forecast_list_network_state_error">No Weather Information Available. The network is not available to fetch weather data</string>
+    <string name="empty_forecast_list_no_network">No Weather Information Available. The network is not available to fetch weather data.</string>
+    <string name="empty_forecast_list_server_down">No Weather Information Available. The server is not returning data.</string>
+    <string name="empty_forecast_list_server_error">No Weather Information Available. The server is not returning valid data. Please check for an updated version of Sunshine.</string>
 
 </resources>
